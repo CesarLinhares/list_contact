@@ -1,4 +1,31 @@
-from pydantic import BaseModel
+from typing import List, Optional
+
+from pydantic import BaseModel, validator
+
+from project.src.core.entities.address import Address
+from project.src.core.entities.email import Email
+from project.src.core.entities.name import Name
+from project.src.core.entities.phones import PhoneList, Phone, assert_have_max_of_3
+
+
+class ContactParameters(BaseModel):
+    email: str
+    address: str
+    lastName: str
+    firstName: str
+    phoneList: List[Phone]
+
+    _max_3_phones = validator('phoneList', allow_reuse=True)(assert_have_max_of_3)
+
+
+class ContactOptionalParameters(BaseModel):
+    email: Optional[str] = None
+    address: Optional[str] = None
+    lastName: Optional[str] = None
+    firstName: Optional[str] = None
+    phoneList: Optional[List[Phone]] = None
+
+    _max_3_phones = validator('phoneList', allow_reuse=True)(assert_have_max_of_3)
 
 
 class Contact(PhoneList):
@@ -6,3 +33,4 @@ class Contact(PhoneList):
     name: Name
     email: Email
     address: Address
+

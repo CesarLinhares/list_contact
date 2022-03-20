@@ -1,11 +1,10 @@
 from hashlib import md5
 
-from project.src.core.entities import Address
-from project.src.core.entities import Contact
-from project.src.core.entities import ContactParameters
-from project.src.core.entities import Email
-from project.src.core.entities import Name
-from project.src.core.entities import Phone
+from project.src.core.entities.address import Address
+from project.src.core.entities.contacts import ContactParameters, Contact
+from project.src.core.entities.email import Email
+from project.src.core.entities.name import Name
+from project.src.core.entities.phones import Phone
 
 
 def _create_id(contact: ContactParameters) -> str:
