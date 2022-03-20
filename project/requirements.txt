@@ -1,0 +1,7 @@
+pymongo
+python-decouple
+pydantic
+fastapi
+redis
+uvicorn
+starlette
