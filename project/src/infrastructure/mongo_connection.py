@@ -10,7 +10,10 @@ class MongoConnection(MongoConnectionInterface):
     def get_singleton_connection(cls) -> pymongo.MongoClient:
         if cls.connection is None:
             try:
-                host = f"mongodb://{config('MONGO_USER')}:{config('MONGO_PASS')}@{config('MONGO_HOST')}:{config('MONGO_PORT')}"
+                if config('MONGO_USER') == "":
+                    host = f"mongodb://{config('MONGO_HOST')}:{config('MONGO_PORT')}"
+                else:
+                    host = f"mongodb://{config('MONGO_USER')}:{config('MONGO_PASS')}@{config('MONGO_HOST')}:{config('MONGO_PORT')}"
                 connection = pymongo.MongoClient(host)
                 cls.connection = connection
             except Exception as error:
