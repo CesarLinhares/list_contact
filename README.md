@@ -29,7 +29,7 @@ Serviço
 | Cesar            | João            |
 |:----------------:|:---------------:|
 | Cadastrar        | Editar          |
-| Buscar por letra | Listagens       |
-| Detalhe          | Excluir         |
+| Buscar por letra | Excluir         |
+| Detalhe          | Sigleton redis  |
 | Contagem         | Contagem        |
-| Sigleton redis   | Singleton Mongo |
+| Listagens        | Singleton Mongo |
