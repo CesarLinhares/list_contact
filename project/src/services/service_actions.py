@@ -114,15 +114,15 @@ class RegisterContact(InterfaceRegister):
         register_return = {"status": return_status}
         return register_return
 
-    def _update_contact_in_mongo(self, contact: Contact) -> bool:
+    def _update_contact_in_mongo(self, contact) -> bool:
         repository = SetExistentContact(self.mongo_infrastructure)
         status_active = Active(is_active=True)
-        return repository.update_contact(contact.contactId, {'status': status_active.is_active})
+        return repository.update_contact(contact.get('_id'), {'active': status_active.is_active})
 
-    def _check_contact_history(self, contact: dict) -> bool:
+    def _check_contact_history(self, contact) -> bool:
         return self.redis_repository.verify_if_contact_was_deleted(contact)
 
-    def _clean_contact_history(self, contact: dict) -> bool:
+    def _clean_contact_history(self, contact) -> bool:
         return self.redis_repository.delete_contact_from_redis(contact)
 
     def _register_contact_in_mongo(self, contact: dict) -> bool:

@@ -15,7 +15,8 @@ class RedisConnection(RedisConnectionInterface):
                     host=config("REDIS_HOST"),
                     port=config("REDIS_PORT"),
                     password=config("REDIS_PASS"),
-                    db=config("REDIS_DB"))
+                    db=config("REDIS_DB")
+                )
 
                 cls.connection = connection
 
