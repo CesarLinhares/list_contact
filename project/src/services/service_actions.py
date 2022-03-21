@@ -113,7 +113,7 @@ class RegisterContact(InterfaceRegister):
     ):
         self.mongo_infrastructure = mongo_infrastructure
         self.redis_repository = SoftDeleteContact(redis_infrastructure)
-        self.register_methods_if_history: Dict[bool, Callable[[Contact], bool]] = {
+        self.register_methods_if_history = {
             True: lambda contact: all((
                 self._clean_contact_history(contact),
                 self._update_contact_in_mongo(contact)
@@ -133,15 +133,15 @@ class RegisterContact(InterfaceRegister):
     def _update_contact_in_mongo(self, contact: Contact) -> bool:
         repository = SetExistentContact(self.mongo_infrastructure)
         status_active = Active(is_active=True)
-        return repository.update_contact(contact.contactId, [status_active])
+        return repository.update_contact(contact.contactId, {'status': status_active.is_active})
 
-    def _check_contact_history(self, contact: Contact) -> bool:
+    def _check_contact_history(self, contact: dict) -> bool:
         return self.redis_repository.verify_if_contact_was_deleted(contact)
 
-    def _clean_contact_history(self, contact: Contact) -> bool:
+    def _clean_contact_history(self, contact: dict) -> bool:
         return self.redis_repository.delete_contact_from_redis(contact)
 
-    def _register_contact_in_mongo(self, contact: Contact) -> bool:
+    def _register_contact_in_mongo(self, contact: dict) -> bool:
         contacts_repository = SetNewContact(self.mongo_infrastructure)
         return contacts_repository.register(contact)
 
@@ -167,7 +167,7 @@ class DeleteContact(InterfaceDelete):
         if not contact:
             return {'status': self.status_alias.get(False)}
         add_to_redis = self.redis_repository.add_contact_to_redis(contact)
-        update_repository.update_contact(contact_id, [Active(is_active=False)])
+        update_repository.update_contact(contact_id, {'active': False})
         return {'status': self.status_alias.get(update_repository and add_to_redis)}
 
 
@@ -190,13 +190,23 @@ class UpdateContact(InterfaceUpdate):
         self.mongo_infrastructure = mongo_infrastructure
 
     def update(self, contact_id: str, contact: ContactOptionalParameters) -> dict:
-        updates_list = self._wrapp_contact_parameters_in_update_entities(contact)
+        updates_list = self._parameter_adjuster(contact)
         repository_update = SetExistentContact(self.mongo_infrastructure)
         update_status = repository_update.update_contact(contact_id, updates_list)
         return {"status": self.status_alias.get(update_status)}
 
+    def _parameter_adjuster(self, contact: ContactOptionalParameters) -> dict:
+        phone_numbers = []
+        for number in contact.phoneList:
+            phone = {'type': number.type.value, 'number': number.number}
+            phone_numbers.append(phone)
+        updates_dict = contact.dict()
+        updates_dict.update({'phoneList': phone_numbers})
+        return updates_dict
+
     def _wrapp_contact_parameters_in_update_entities(self, contact: ContactOptionalParameters) -> list:
         updates_dict = contact.dict()
+        print(updates_dict)
         for key in filter(lambda x: updates_dict.get(x) is not None, updates_dict):
             update_wrapp_method = self.update_wrapp_methods_per_field.get(key)
             update_value = update_wrapp_method(updates_dict.get(key))
