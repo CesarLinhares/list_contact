@@ -5,8 +5,8 @@ from project.src.core.interfaces.repository_interfaces import InterfaceMongo
 
 
 class MongoActions(InterfaceMongo):
-    DATABASE: str
-    COLLECTION: str
+    DATABASE: str = "contact_list"
+    COLLECTION: str = "contacts"
 
     def __init__(self, infrastructure: MongoClient):
         connection = infrastructure
