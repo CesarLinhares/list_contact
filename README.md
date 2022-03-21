@@ -23,3 +23,13 @@ Serviço
 
 
 * Fazer as funcionalidades do serviço em um único arquivo.
+
+---
+
+| Cesar            | João            |
+|:----------------:|:---------------:|
+| Cadastrar        | Editar          |
+| Buscar por letra | Listagens       |
+| Detalhe          | Excluir         |
+| Contagem         | Contagem        |
+| Sigleton redis   | Singleton Mongo |
