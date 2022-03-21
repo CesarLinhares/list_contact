@@ -25,56 +25,49 @@ class ContactDetail(InterfaceDetail):
 
     def get_detail(self, _id: str) -> dict:
         contact_detail_repository = GetContact(self.infrastructure)
-        contact_detail: Optional[Contact] = contact_detail_repository.get(_id)
+        contact_detail = contact_detail_repository.get(_id)
+        contact_detail.pop("active")
         if not contact_detail:
             return {"status": Status.ERROR.value}
-        contact_as_json = {
-            "contactId": contact_detail.contactId,
-            "firstName": contact_detail.name.firstName,
-            "lastName": contact_detail.name.lastName,
-            "email": contact_detail.email.email,
-            "address": contact_detail.address.full_address,
-            "phoneList": [{
-                "number": phone.number,
-                "type": phone.type,
-            } for phone in contact_detail.phoneList],
-            str(Status.SUCCESS.name).lower(): Status.SUCCESS.value,
-        }
-        return contact_as_json
+        return contact_detail
 
 
 class CountContacts(InterfaceList):
 
     def __init__(self, infrastructure: MongoClient):
         self.infrastructure = infrastructure
+        self.countContact = []
+        self.phone_type = []
 
     def get_list(self, optional_filter: Optional[dict] = {}) -> dict:
         contacts_repository = GetContactList(self.infrastructure)
-        list_of_contacts: List[Contact] = contacts_repository.get(optional_filter)
-        phones_types_count = self._count_phones_types(list_of_contacts)
-        phones_types_result = [{
-            "_id": phone_type,
-            "Count": count
-        } for phone_type, count in phones_types_count.items()]
-        return {
-            "countContacts": len(list_of_contacts),
-            "countType": phones_types_result,
-            "status": Status.SUCCESS.value,
-        }
+        list_of_contacts = contacts_repository.get(optional_filter)
+        l1 = list_of_contacts
+        l2 = list_of_contacts
+        for nunContact in list_of_contacts:
+            self.countContact.append(nunContact["_id"])
+            for phones in nunContact['phones']:
+                self.phone_type.append(phones.get('type'))
 
-    @staticmethod
-    def _count_phones_types(contact_list: List[Contact]) -> Dict[PhoneType, int]:
-        phones_types_count = {
-            phone_type: 0
-            for phone_type in PhoneType.__members__
+
+        return_json = {
+            "countContacts": len(self.countContact),
+            "countType": [
+                {
+                    "_id": "residential",
+                    "Count": self.phone_type.count("residential")
+                },
+                {
+                    "_id": "mobile",
+                    "Count": self.phone_type.count("mobile"),
+                },
+                {
+                    "_id": "commercial",
+                    "Count": self.phone_type.count("commercial")
+                }
+            ]
         }
-        for contact in contact_list:
-            for phone in contact.phoneList:
-                phone_type = phone.type.value
-                phones_types_count.update({
-                    phone_type: phones_types_count.get(phone_type) + 1
-                })
-        return phones_types_count
+        return return_json
 
 
 class ListsContacts(InterfaceList):
@@ -84,17 +77,11 @@ class ListsContacts(InterfaceList):
 
     def get_list(self, optional_filter: Optional[dict] = {}) -> dict:
         contacts_repository = GetContactList(self.infrastructure)
-        list_of_contacts: List[Contact] = contacts_repository.get(optional_filter)
-        list_of_contacts_return = [{
-            "contactId": contact.contactId,
-            "firstName": contact.name.firstName,
-            "lastName": contact.name.lastName,
-            "email": contact.email.email,
-            "phoneList": [{
-                "number": phone.number,
-                "type": phone.type,
-            } for phone in contact.phoneList]
-        } for contact in list_of_contacts]
+        list_of_contacts = contacts_repository.get(optional_filter)
+        list_of_contacts_return = []
+        for contact in list_of_contacts:
+            contact.pop("active")
+            list_of_contacts_return.append(contact)
         if not list_of_contacts_return:
             return {'status': Status.ERROR.value}
         return {'contactsList': list_of_contacts_return, 'status': Status.SUCCESS.value}
