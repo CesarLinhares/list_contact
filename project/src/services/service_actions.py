@@ -27,6 +27,7 @@ class ContactDetail(InterfaceDetail):
         contact_detail_repository = GetContact(self.infrastructure)
         contact_detail = contact_detail_repository.get(_id)
         contact_detail.pop("active")
+        contact_detail.update({'status': Status.SUCCESS.value})
         if not contact_detail:
             return {"status": Status.ERROR.value}
         return contact_detail
@@ -42,14 +43,10 @@ class CountContacts(InterfaceList):
     def get_list(self, optional_filter: Optional[dict] = {}) -> dict:
         contacts_repository = GetContactList(self.infrastructure)
         list_of_contacts = contacts_repository.get(optional_filter)
-        l1 = list_of_contacts
-        l2 = list_of_contacts
         for nunContact in list_of_contacts:
             self.countContact.append(nunContact["_id"])
             for phones in nunContact['phones']:
                 self.phone_type.append(phones.get('type'))
-
-
         return_json = {
             "countContacts": len(self.countContact),
             "countType": [
@@ -190,11 +187,3 @@ class UpdateContact(InterfaceUpdate):
         updates_dict = contact.dict()
         updates_dict.update({'phoneList': phone_numbers})
         return updates_dict
-
-    def _wrapp_contact_parameters_in_update_entities(self, contact: ContactOptionalParameters) -> list:
-        updates_dict = contact.dict()
-        print(updates_dict)
-        for key in filter(lambda x: updates_dict.get(x) is not None, updates_dict):
-            update_wrapp_method = self.update_wrapp_methods_per_field.get(key)
-            update_value = update_wrapp_method(updates_dict.get(key))
-            yield update_value
