@@ -117,7 +117,9 @@ class RegisterContact(InterfaceRegister):
     def _update_contact_in_mongo(self, contact) -> bool:
         repository = SetExistentContact(self.mongo_infrastructure)
         status_active = Active(is_active=True)
-        return repository.update_contact(contact.get('_id'), {'active': status_active.is_active})
+        message = repository.update_contact(contact.get('_id'), {'active': status_active.is_active})
+        repository.update_contact(contact.get('_id'), contact)
+        return message
 
     def _check_contact_history(self, contact) -> bool:
         return self.redis_repository.verify_if_contact_was_deleted(contact)
