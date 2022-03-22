@@ -6,7 +6,7 @@ from src.core.enum.phone_type import PhoneType
 
 
 class Phone(BaseModel):
-    type: PhoneType
+    type: str
     number: str
 
 

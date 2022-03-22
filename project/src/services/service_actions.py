@@ -16,7 +16,7 @@ from src.core.interfaces.services_interfaces import InterfaceDetail, InterfaceLi
     InterfaceDelete, InterfaceUpdate
 from src.repository.repository_actions import GetContact, GetContactList, SetExistentContact, SetNewContact, \
     SoftDeleteContact
-from src.services.utilities.transform_parameters_to_contact import transform_parameters_to_contact
+from src.services.utilities.modeling_contact import contact_modeling
 
 
 class ContactDetail(InterfaceDetail):
@@ -26,10 +26,12 @@ class ContactDetail(InterfaceDetail):
     def get_detail(self, _id: str) -> dict:
         contact_detail_repository = GetContact(self.infrastructure)
         contact_detail = contact_detail_repository.get(_id)
-        contact_detail.pop("active")
-        contact_detail.update({'status': Status.SUCCESS.value})
         if not contact_detail:
             return {"status": Status.ERROR.value}
+        contact_detail.pop("active")
+        contact_detail.update({'contactId': contact_detail.get('_id')})
+        contact_detail.pop("_id")
+        contact_detail.update({'status': Status.SUCCESS.value})
         return contact_detail
 
 
@@ -43,10 +45,11 @@ class CountContacts(InterfaceList):
     def get_list(self, optional_filter: Optional[dict] = {}) -> dict:
         contacts_repository = GetContactList(self.infrastructure)
         list_of_contacts = contacts_repository.get(optional_filter)
-        for nunContact in list_of_contacts:
-            self.countContact.append(nunContact["_id"])
-            for phones in nunContact['phones']:
+        for contact in list_of_contacts:
+            self.countContact.append(contact.get('_id'))
+            for phones in contact.get('phoneList'):
                 self.phone_type.append(phones.get('type'))
+
         return_json = {
             "countContacts": len(self.countContact),
             "countType": [
@@ -62,7 +65,8 @@ class CountContacts(InterfaceList):
                     "_id": "commercial",
                     "Count": self.phone_type.count("commercial")
                 }
-            ]
+            ],
+            'status': "1001"
         }
         return return_json
 
@@ -78,6 +82,9 @@ class ListsContacts(InterfaceList):
         list_of_contacts_return = []
         for contact in list_of_contacts:
             contact.pop("active")
+            contact.update({'contactId': contact.get('_id')})
+            contact.pop("_id")
+            contact.pop("address")
             list_of_contacts_return.append(contact)
         if not list_of_contacts_return:
             return {'status': Status.ERROR.value}
@@ -105,8 +112,8 @@ class RegisterContact(InterfaceRegister):
             False: lambda contact: self._register_contact_in_mongo(contact),
         }
 
-    def register(self, contact_parameters: ContactParameters) -> dict:
-        contact = transform_parameters_to_contact(contact_parameters)
+    def register(self, contact_parameters: dict) -> dict:
+        contact = contact_modeling(contact_parameters)
         has_deletion_history = self._check_contact_history(contact)
         register_method = self.register_methods_if_history.get(has_deletion_history)
         register_status = register_method(contact)
@@ -117,8 +124,19 @@ class RegisterContact(InterfaceRegister):
     def _update_contact_in_mongo(self, contact) -> bool:
         repository = SetExistentContact(self.mongo_infrastructure)
         status_active = Active(is_active=True)
-        message = repository.update_contact(contact.get('_id'), {'active': status_active.is_active})
-        repository.update_contact(contact.get('_id'), contact)
+        contact_copy = contact
+        old_register = repository.find_one(contact.get('_id'))
+        old_phones_list = old_register.get('phoneList')
+        new_phones_list = contact.get('phoneList')
+        update_phone_list: list = new_phones_list
+        cont = len(update_phone_list)
+        for number in old_phones_list:
+            if (number not in new_phones_list) and (cont < 3):
+                update_phone_list.append(number)
+                cont += 1
+        contact_copy['phoneList'] = update_phone_list
+        message = repository.update_contact(contact_copy.get('_id'), contact)
+        # repository.update_contact(contact.get('_id'), contact)
         return message
 
     def _check_contact_history(self, contact) -> bool:
@@ -175,10 +193,13 @@ class UpdateContact(InterfaceUpdate):
     def __init__(self, mongo_infrastructure):
         self.mongo_infrastructure = mongo_infrastructure
 
-    def update(self, contact_id: str, contact: ContactOptionalParameters) -> dict:
-        updates_list = self._parameter_adjuster(contact)
+    def update(self, contact_id: str, contact: dict) -> dict:
+        updates = {}
+        for key, value in contact.items():
+           if value is not None:
+               updates.update({key: value})
         repository_update = SetExistentContact(self.mongo_infrastructure)
-        update_status = repository_update.update_contact(contact_id, updates_list)
+        update_status = repository_update.update_contact(contact_id, updates)
         return {"status": self.status_alias.get(update_status)}
 
     def _parameter_adjuster(self, contact: ContactOptionalParameters) -> dict:

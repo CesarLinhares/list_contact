@@ -22,7 +22,7 @@ app.add_middleware(
 async def validation_exception_handler(request, exception):
     return JSONResponse(
         status_code=status.HTTP_200_OK,
-        content=jsonable_encoder({"status": '1004', 'validation_error': exception}),
+        content=jsonable_encoder({"status": '1004'}),
     )
 
 

@@ -17,7 +17,7 @@ def register_contact(contact: ContactParameters):
     mongo_connection = MongoConnection.get_singleton_connection()
     redis_connection = RedisConnection.get_singleton_connection()
     register_service: InterfaceRegister = RegisterContact(mongo_connection, redis_connection)
-    register_return = register_service.register(contact)
+    register_return = register_service.register(contact.dict())
     return register_return
 
 
@@ -49,7 +49,7 @@ def contact_detail(_id: str):
 def contact_update(_id: str, updates: ContactOptionalParameters):
     mongo_connection = MongoConnection.get_singleton_connection()
     get_contact_update_service: InterfaceUpdate = UpdateContact(mongo_connection)
-    contact_updates = get_contact_update_service.update(_id, updates)
+    contact_updates = get_contact_update_service.update(_id, updates.dict())
     return contact_updates
 
 
