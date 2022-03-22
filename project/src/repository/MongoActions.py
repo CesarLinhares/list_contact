@@ -1,7 +1,7 @@
 from pymongo import MongoClient
 from pymongo.errors import DuplicateKeyError
 
-from project.src.core.interfaces.repository_interfaces import InterfaceMongo
+from src.core.interfaces.repository_interfaces import InterfaceMongo
 
 
 class MongoActions(InterfaceMongo):

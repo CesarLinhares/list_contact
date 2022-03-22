@@ -2,10 +2,10 @@ from typing import List, Optional
 
 from pydantic import BaseModel, validator
 
-from project.src.core.entities.address import Address
-from project.src.core.entities.email import Email
-from project.src.core.entities.name import Name
-from project.src.core.entities.phones import PhoneList, Phone, assert_have_max_of_3
+from src.core.entities.address import Address
+from src.core.entities.email import Email
+from src.core.entities.name import Name
+from src.core.entities.phones import PhoneList, Phone, assert_have_max_of_3
 
 
 class ContactParameters(BaseModel):

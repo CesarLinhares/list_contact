@@ -1,7 +1,7 @@
 from redis.client import Redis
 from redis.exceptions import ConnectionError
 
-from project.src.core.interfaces.repository_interfaces import InterfaceRedis
+from src.core.interfaces.repository_interfaces import InterfaceRedis
 
 
 class RedisActions(InterfaceRedis):

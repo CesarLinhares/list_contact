@@ -4,19 +4,19 @@ from pydantic import BaseModel
 from pymongo import MongoClient
 from redis import Redis
 
-from project.src.core.entities.active import Active
-from project.src.core.entities.address import Address
-from project.src.core.entities.contacts import Contact, ContactParameters, ContactOptionalParameters
-from project.src.core.entities.email import Email
-from project.src.core.entities.name import FirstName, LastName
-from project.src.core.entities.phones import PhoneList, Phone
-from project.src.core.enum.phone_type import PhoneType
-from project.src.core.enum.status import Status
-from project.src.core.interfaces.services_interfaces import InterfaceDetail, InterfaceList, InterfaceRegister, \
+from src.core.entities.active import Active
+from src.core.entities.address import Address
+from src.core.entities.contacts import Contact, ContactParameters, ContactOptionalParameters
+from src.core.entities.email import Email
+from src.core.entities.name import FirstName, LastName
+from src.core.entities.phones import PhoneList, Phone
+from src.core.enum.phone_type import PhoneType
+from src.core.enum.status import Status
+from src.core.interfaces.services_interfaces import InterfaceDetail, InterfaceList, InterfaceRegister, \
     InterfaceDelete, InterfaceUpdate
-from project.src.repository.repository_actions import GetContact, GetContactList, SetExistentContact, SetNewContact, \
+from src.repository.repository_actions import GetContact, GetContactList, SetExistentContact, SetNewContact, \
     SoftDeleteContact
-from project.src.services.utilities.transform_parameters_to_contact import transform_parameters_to_contact
+from src.services.utilities.transform_parameters_to_contact import transform_parameters_to_contact
 
 
 class ContactDetail(InterfaceDetail):

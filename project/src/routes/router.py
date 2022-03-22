@@ -1,13 +1,13 @@
 from fastapi import APIRouter
 
-from project.src.core.entities.contacts import ContactParameters, ContactOptionalParameters
-from project.src.core.interfaces.services_interfaces import InterfaceRegister, InterfaceList, InterfaceDetail, \
+from src.core.entities.contacts import ContactParameters, ContactOptionalParameters
+from src.core.interfaces.services_interfaces import InterfaceRegister, InterfaceList, InterfaceDetail, \
     InterfaceUpdate, InterfaceDelete
-from project.src.infrastructure.mongo_connection import MongoConnection
-from project.src.infrastructure.redis_connection import RedisConnection
-from project.src.services.service_actions import RegisterContact, ListsContacts, CountContacts, ContactDetail, \
+from src.infrastructure.mongo_connection import MongoConnection
+from src.infrastructure.redis_connection import RedisConnection
+from src.services.service_actions import RegisterContact, ListsContacts, CountContacts, ContactDetail, \
     UpdateContact, DeleteContact
-from project.src.services.utilities.env_config import config
+from src.services.utilities.env_config import config
 
 route = APIRouter(prefix=config("ROUTERS_PREFIX"))
 

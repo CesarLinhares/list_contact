@@ -1,10 +1,10 @@
 from typing import List, Iterator, Optional
 
-from project.src.core.entities.contacts import Contact
-from project.src.core.enum.active import ActiveCondition
-from project.src.repository.MongoActions import MongoActions
-from project.src.repository.RedisActions import RedisActions
-from project.src.repository.utilities.convert_dict_to_contact import convert_dict_to_contact
+from src.core.entities.contacts import Contact
+from src.core.enum.active import ActiveCondition
+from src.repository.MongoActions import MongoActions
+from src.repository.RedisActions import RedisActions
+from src.repository.utilities.convert_dict_to_contact import convert_dict_to_contact
 
 
 class GetContact(MongoActions):

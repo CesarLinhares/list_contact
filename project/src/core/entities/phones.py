@@ -2,7 +2,7 @@ from typing import List
 
 from pydantic import BaseModel, validator
 
-from project.src.core.enum.phone_type import PhoneType
+from src.core.enum.phone_type import PhoneType
 
 
 class Phone(BaseModel):

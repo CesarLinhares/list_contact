@@ -1,6 +1,6 @@
 import pymongo
-from project.src.services.utilities.env_config import config
-from project.src.core.interfaces.infrastructure_interfaces import MongoConnectionInterface
+from src.services.utilities.env_config import config
+from src.core.interfaces.infrastructure_interfaces import MongoConnectionInterface
 
 
 class MongoConnection(MongoConnectionInterface):

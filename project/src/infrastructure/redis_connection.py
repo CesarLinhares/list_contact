@@ -1,7 +1,7 @@
 from redis.client import Redis
 
-from project.src.core.interfaces.infrastructure_interfaces import RedisConnectionInterface
-from project.src.services.utilities.env_config import config
+from src.core.interfaces.infrastructure_interfaces import RedisConnectionInterface
+from src.services.utilities.env_config import config
 
 
 class RedisConnection(RedisConnectionInterface):
